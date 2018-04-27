@@ -12,14 +12,13 @@ RTTConnector::RTTConnector(QObject *parent) : QObject(parent) {
 }
 
 RTTConnector::~RTTConnector() {
-
     disconnectFromHost();
     delete socket;
     delete[] buffer;
 }
 
 void RTTConnector::connectToHost() {
-    socket->connectToHost("127.0.0.1", 23);
+    socket->connectToHost("127.0.0.1", 19021);
     if (!socket->waitForConnected()) {
         qDebug() << "Error: " << socket->errorString();
     }

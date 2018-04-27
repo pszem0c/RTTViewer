@@ -19,8 +19,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     rttlogger.cpp \
-    rttconnector.cpp
+    rttconnector.cpp \
+    rttparser.cpp
 
 HEADERS += \
     rttlogger.h \
-    rttconnector.h
+    rttconnector.h \
+    rttparser.h \
+    rttchannel.h

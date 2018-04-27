@@ -21,3 +21,7 @@ void RTTLogger::printError(qint16 error) {
 void RTTLogger::printMessage(QString str) {
     std::cout << "Message: " << str.toStdString() << std::endl;
 }
+
+void RTTLogger::printChannel(qint32 id, qint32 value) {
+    std::cout << "[" << id << "] " << value << std::endl;
+}

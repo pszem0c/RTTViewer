@@ -15,7 +15,7 @@ public slots:
     void printConnected();
     void printError(qint16 error);
     void printMessage(QString str);
-
+    void printChannel(qint32 id, qint32 value);
 };
 
 #endif // RTTLOGGER_H
