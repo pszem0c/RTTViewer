@@ -27,9 +27,9 @@ void RTTConnector::connectToHost() {
 void RTTConnector::disconnectFromHost() {
     if (socket->state() == QTcpSocket::ConnectedState) {
         socket->disconnect();
-    }
-    if(!socket->waitForDisconnected()) {
-        qDebug() << "Error: " << socket->errorString();
+        if(!socket->waitForDisconnected()) {
+            qDebug() << "Error: " << socket->errorString();
+        }
     }
 }
 
