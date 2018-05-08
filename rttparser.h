@@ -16,10 +16,11 @@ public:
     ~RTTParser();
 
     void addChannel(qint32 id, QString format);
+    void removeChannel(qint32 id);
     void parseLine(QString line);
 
 signals:
-    void lineParsed(int id, int value);
+    void lineParsed(qint32 id, qint32 value);
 public slots:
     void parseSlot(QString line);
 };

@@ -9,10 +9,22 @@ RTTParser::~RTTParser() {
    for (QList<RTTChannel* >::iterator it = channelList.begin(); it != channelList.end(); it++) {
         delete *it;
    }
+   channelList.clear();
 }
 
 void RTTParser::addChannel(qint32 id, QString format) {
     channelList.append(new RTTChannel(id, format));
+}
+
+void RTTParser::removeChannel(qint32 id) {
+    for (QList<RTTChannel* >::iterator it = channelList.begin(); it != channelList.end(); it++) {
+        if ((*it)->id == id) {
+            RTTChannel* ptr = *it;
+            channelList.removeOne(ptr);
+            delete ptr;
+            break;
+        }
+    }
 }
 
 void RTTParser::parseLine(QString line) {
