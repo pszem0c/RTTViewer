@@ -1,6 +1,10 @@
 #include "rttparser.h"
 #include "rttchannel.h"
 
+#include <QDebug>
+
+
+
 RTTParser::RTTParser(QObject *parent) : QObject(parent) {
 
 }
@@ -10,6 +14,10 @@ RTTParser::~RTTParser() {
         delete *it;
    }
    channelList.clear();
+}
+
+bool RTTParser::pairLessThan(const QPair<qint32, qint32> p1, const QPair<qint32, qint32> p2) {
+    return p1.first < p2.first;
 }
 
 void RTTParser::addChannel(qint32 id, QString format) {
@@ -28,11 +36,19 @@ void RTTParser::removeChannel(qint32 id) {
 }
 
 void RTTParser::parseLine(QString line) {
-    QStringList lineDataList = line.split("=");
-    for (QList<RTTChannel* >::iterator it = channelList.begin(); it != channelList.end(); it++) {
-        if (((QString)lineDataList.at(0)).contains((*it)->format)) {
-            emit lineParsed((*it)->id, ((QString)lineDataList.at(1)).toInt());
+    QStringList channelDataList = line.split("\n");
+    QList<QPair<qint32, qint32> > dataList;
+    for (QList<QString>::iterator it = channelDataList.begin(); it != channelDataList.end(); it++) {
+        QStringList lineDataList = (*it).split("=");
+        for (QList<RTTChannel* >::iterator it = channelList.begin(); it != channelList.end(); it++) {
+            if (QString::compare((QString)lineDataList.at(0),(*it)->format, Qt::CaseInsensitive) == 0) {
+                dataList.append(QPair<qint32, qint32>((*it)->id, ((QString)lineDataList.at(1)).toInt()));
+            }
         }
+    }
+    if (dataList.count() > 0) {
+        std::sort(dataList.begin(),dataList.end(), RTTParser::pairLessThan);
+        emit lineParsed(dataList);
     }
 }
 

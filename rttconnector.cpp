@@ -3,16 +3,12 @@
 
 RTTConnector::RTTConnector(QObject *parent) : QObject(parent) {
     socket = new QTcpSocket;
-    buffer = new char[100];
+    buffer = new char[4096];
 
-    connect(socket, SIGNAL(connected()), this, SLOT(connectedToHostSlot()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnectedFromHostSlot()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readReadySlot()));
+
 }
 
 RTTConnector::~RTTConnector() {
-    disconnectFromHost();
     delete socket;
     delete[] buffer;
 }
@@ -22,13 +18,24 @@ void RTTConnector::connectToHost() {
     if (!socket->waitForConnected()) {
         qDebug() << "Error: " << socket->errorString();
     }
+    if (socket->state() == QTcpSocket::ConnectedState) {
+
+        connect(socket, SIGNAL(connected()), this, SLOT(connectedToHostSlot()));
+        connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)));
+        connect(socket, SIGNAL(disconnected()), this, SLOT(disconnectedFromHostSlot()));
+        connect(socket, SIGNAL(readyRead()), this, SLOT(readReadySlot()));
+
+        qDebug() << "socket connected";
+    }
 }
 
 void RTTConnector::disconnectFromHost() {
     if (socket->state() == QTcpSocket::ConnectedState) {
-        socket->disconnect();
-        if(!socket->waitForDisconnected()) {
-            qDebug() << "Error: " << socket->errorString();
+        socket->disconnectFromHost();
+        if(socket->state() != QTcpSocket::UnconnectedState) {
+            if(!socket->waitForDisconnected()) {
+                qDebug() << "Error: " << socket->errorString();
+            }
         }
     }
 }
@@ -47,9 +54,14 @@ void RTTConnector::disconnectedFromHostSlot() {
 
 void RTTConnector::readReadySlot() {
     if (socket->canReadLine()) {
-        QString str;
-        socket->readLine(buffer, 100);
-        str = QString(buffer);
-        emit lineRead(str);
+        if (socket->bytesAvailable() > 4096) {
+            socket->readAll();
+        } else {
+            QString str;
+            std::fill(buffer,buffer+4096,0);
+            socket->read(buffer, socket->bytesAvailable());
+            str = QString(buffer);
+            emit lineRead(str);
+        }
     }
 }
