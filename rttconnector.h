@@ -19,7 +19,7 @@ public:
     void disconnectFromHost();
 
 signals:
-    void socketError(qint16);
+    void socketError(QString);
     void connectedToHost();
     void disconnectedFromHost();
     void lineRead(QString);

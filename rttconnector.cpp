@@ -5,6 +5,10 @@ RTTConnector::RTTConnector(QObject *parent) : QObject(parent) {
     socket = new QTcpSocket;
     buffer = new char[4096];
 
+        connect(socket, SIGNAL(connected()), this, SLOT(connectedToHostSlot()));
+        connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)));
+        connect(socket, SIGNAL(disconnected()), this, SLOT(disconnectedFromHostSlot()));
+        connect(socket, SIGNAL(readyRead()), this, SLOT(readReadySlot()));
 
 }
 
@@ -20,10 +24,6 @@ void RTTConnector::connectToHost() {
     }
     if (socket->state() == QTcpSocket::ConnectedState) {
 
-        connect(socket, SIGNAL(connected()), this, SLOT(connectedToHostSlot()));
-        connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)));
-        connect(socket, SIGNAL(disconnected()), this, SLOT(disconnectedFromHostSlot()));
-        connect(socket, SIGNAL(readyRead()), this, SLOT(readReadySlot()));
 
         qDebug() << "socket connected";
     }
@@ -44,8 +44,8 @@ void RTTConnector::connectedToHostSlot() {
     emit connectedToHost();
 }
 
-void RTTConnector::errorSlot(QAbstractSocket::SocketError error) {
-    emit socketError((qint16)error);
+void RTTConnector::errorSlot(QAbstractSocket::SocketError) {
+    emit socketError(socket->errorString());
 }
 
 void RTTConnector::disconnectedFromHostSlot() {
