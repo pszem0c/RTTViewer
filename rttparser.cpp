@@ -36,13 +36,16 @@ void RTTParser::removeChannel(qint32 id) {
 }
 
 void RTTParser::parseLine(QString line) {
-    QStringList channelDataList = line.split("\n");
-    QList<QPair<qint32, qint32> > dataList;
+    QStringList channelDataList = line.split("\r\n");
+    for (auto s : channelDataList) {
+        qDebug() << s;
+    }
+    QList<QPair<qint32, float> > dataList;
     for (QList<QString>::iterator it = channelDataList.begin(); it != channelDataList.end(); it++) {
         QStringList lineDataList = (*it).split("=");
         for (QList<RTTChannel* >::iterator it = channelList.begin(); it != channelList.end(); it++) {
             if (QString::compare((QString)lineDataList.at(0),(*it)->format, Qt::CaseInsensitive) == 0) {
-                dataList.append(QPair<qint32, qint32>((*it)->id, ((QString)lineDataList.at(1)).toInt()));
+                dataList.append(QPair<qint32, float>((*it)->id, ((QString)lineDataList.at(1)).toFloat()));
             }
         }
     }

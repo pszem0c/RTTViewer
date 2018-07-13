@@ -23,7 +23,7 @@ public:
 
 signals:
     void lineParsed(qint32 id, qint32 value);
-    void lineParsed(QList<QPair<qint32, qint32> >);
+    void lineParsed(QList<QPair<qint32, float> >);
 public slots:
     void parseSlot(QString line);
 };
